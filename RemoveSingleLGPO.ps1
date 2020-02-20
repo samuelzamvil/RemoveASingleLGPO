@@ -43,12 +43,9 @@ function updatePolicy {
         $PolicyLine = $Policy.IndexOf($Pattern)
         for ($i = 0; $i -lt $Policy.Length; $i++) {
             # Make new file by ignoring the lines the policy exists on
-            if (-not($i -eq ($PolicyLine + 1))) {
+            if ($i -le ($PolicyLine - 4) -or $i -ge ($PolicyLine + 2)) {
                 $Policy[$i] | out-file $UpdatedPolicyFile -Append -Force
             } # end if
-            else {
-                "DELETE" | out-file $UpdatedPolicyFile -Append -Force
-            }
         } # end for
     } #end if
     else {
@@ -58,13 +55,13 @@ function updatePolicy {
 
 function encapsulateParsedPolicy {
     & $LGPOLocation /r $UpdatedPolicyFile /w $UpdatedRegPolFile
-    if ($LASTEXITCODE -ne 0) {
-        exit 2
-    }
 } # end function
 
 function replacePolFile {
     Copy-Item $UpdatedRegPolFile $RegPolFilePath
+}
+function removeOldPolicyFile {
+    Remove-Item 'C:\Windows\System32\GroupPolicy\Machine\Registry.pol' -Force
 }
 function importUpdatedPolicy {
     & $LGPOLocation /m $UpdatedRegPolFile
@@ -76,4 +73,5 @@ renameBackup
 $ParsedComputerPolicy = extractParsedPolicy
 updatePolicy -Policy $ParsedComputerPolicy -Pattern $DefaultAssociationsPattern
 encapsulateParsedPolicy
+removeOldPolicyFile
 importUpdatedPolicy
