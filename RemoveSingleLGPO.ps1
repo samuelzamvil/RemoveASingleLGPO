@@ -64,7 +64,7 @@ function encapsulateParsedPolicy {
 function replacePolFile {
     Copy-Item $UpdatedRegPolFile $RegPolFilePath
 } # end function
-function removeOldPolicyFiles {
+function removeOldPolicyFile {
     Remove-Item 'C:\Windows\System32\GroupPolicy\Machine\Registry.pol' -Force
 } # end function
 function importUpdatedPolicy {
