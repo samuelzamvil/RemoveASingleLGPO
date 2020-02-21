@@ -63,19 +63,28 @@ function encapsulateParsedPolicy {
 
 function replacePolFile {
     Copy-Item $UpdatedRegPolFile $RegPolFilePath
-}
+} # end function
 function removeOldPolicyFiles {
     Remove-Item 'C:\Windows\System32\GroupPolicy\Machine\Registry.pol' -Force
-}
+} # end function
 function importUpdatedPolicy {
     & $LGPOLocation /m $UpdatedRegPolFile
+} # end function
+
+function updateGroupPolicy {
+    gpupdate /force    
+} # end function
+function main {
+    removeExistingBackupFolder
+    makeBackupFolder
+    backupLGPO
+    renameBackup
+    $ParsedComputerPolicy = extractParsedPolicy
+    updatePolicy -Policy $ParsedComputerPolicy -Pattern $DefaultAssociationsPattern
+    encapsulateParsedPolicy
+    removeOldPolicyFile
+    importUpdatedPolicy
+    updateGroupPolicy
 }
-removeExistingBackupFolder
-makeBackupFolder
-backupLGPO
-renameBackup
-$ParsedComputerPolicy = extractParsedPolicy
-updatePolicy -Policy $ParsedComputerPolicy -Pattern $DefaultAssociationsPattern
-encapsulateParsedPolicy
-removeOldPolicyFile
-importUpdatedPolicy
+
+main
