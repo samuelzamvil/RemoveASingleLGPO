@@ -55,12 +55,16 @@ function updatePolicy {
 
 function encapsulateParsedPolicy {
     & $LGPOLocation /r $UpdatedPolicyFile /w $UpdatedRegPolFile
+    # if updating the pol file fails exit
+    if ($LASTEXITCODE -ne 0) {
+        exit 2
+    }
 } # end function
 
 function replacePolFile {
     Copy-Item $UpdatedRegPolFile $RegPolFilePath
 }
-function removeOldPolicyFile {
+function removeOldPolicyFiles {
     Remove-Item 'C:\Windows\System32\GroupPolicy\Machine\Registry.pol' -Force
 }
 function importUpdatedPolicy {
